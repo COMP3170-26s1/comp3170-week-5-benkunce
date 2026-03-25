@@ -17,7 +17,11 @@ public class Flower extends SceneObject {
 	private static final String FRAGMENT_SHADER = "fragment.glsl";
 	private Shader shader;
 	
-	private final float HEIGHT = 1.0f;
+	private float swayAngle = 0f;
+	private float swaySpeed = 1f;
+	private float swayMax = 0.2f;
+	
+	private final float HEIGHT = 0.5f;
 	private final float WIDTH = 0.1f;
 	private Vector3f colour = new Vector3f(0f, 0.5f, 0f); // Dark Green
 
@@ -25,6 +29,8 @@ public class Flower extends SceneObject {
 	private int vertexBuffer;
 	private int[] indices;
 	private int indexBuffer;
+	private float x;
+	private float y;
 
 	public Flower(int nPetals) {
 		shader = ShaderLibrary.instance.compileShader(VERTEX_SHADER, FRAGMENT_SHADER);		
@@ -72,6 +78,9 @@ public class Flower extends SceneObject {
 	}
 	
 	public void update(float dt) {
-		// TODO: make the flower sway. (TASK 5)
+		swayAngle += swaySpeed * dt;
+		float rotation = (float)Math.sin(swayAngle) + swayMax;
+		
+	 getMatrix().rotateZ(rotation);
 	}
 }

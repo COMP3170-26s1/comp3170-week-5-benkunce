@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL41.*;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
+import org.joml.Vector4f;
 
 import comp3170.OpenGLException;
 import comp3170.IWindowListener;
@@ -41,6 +42,7 @@ public class Week5 implements IWindowListener {
 		
 		new ShaderLibrary(DIRECTORY);
 		scene = new Scene();
+		
 	}
 	
 	private Vector2i position = new Vector2i();
@@ -50,10 +52,24 @@ public class Week5 implements IWindowListener {
 		float deltaTime = (time - oldTime) / 1000f;
 		oldTime = time;		
 		if (input.wasMouseClicked()) {
-			// TODO: Get the mouse position into NDC, and then into world space. (TASK 2)
+			
 			input.getCursorPos(position); // This will get the mouse position in screen space.
+			 float nX = (2.0f * position.x / width) - 1.0f;
+		     float nY = 1.0f - (2.0f * position.y / height); // flip Y
+		     
+		     float aspect = (float)width / (float)height;
+		     float halfWidth = scene.sceneCam().getZoom() * aspect;
+		     float halfHeight = scene.sceneCam().getZoom();
+		     
+		     float worldX = nX * halfWidth;
+		     float worldY = nY *halfHeight;
+		     
+		     
+		     scene.createFlower(new Vector4f(worldX,worldY,0,1));
 
-			// TODO: Add a new flower at the mouse position. (TASK 3)
+			
+			
+			
 		}
 		
 		input.clear(); // Run this to clear input before the next frame.
@@ -70,8 +86,12 @@ public class Week5 implements IWindowListener {
 		glClearColor(87.0f/255.0f, 60.0f/255.0f, 23.0f/255.0f, 1.0f); // Dirt brown
 		glClear(GL_COLOR_BUFFER_BIT);		
 		
-		// TODO: Use the view and projection matricies to construct the mvpMatrix. (TASK 2)
-		//			Then send it down the scene graph!
+		scene.sceneCam().GetViewMatrix(viewMatrix);
+		scene.sceneCam().GetProjectionMatrix(projectionMatrix);
+
+		
+		projectionMatrix.mul(viewMatrix,mvpMatrix);
+
 		scene.draw(mvpMatrix);
 			
 	}
@@ -82,7 +102,8 @@ public class Week5 implements IWindowListener {
 		this.width = width;
 		this.height = height;
 		glViewport(0,0,width,height);
-		// TODO: Recalculate the projection matrix when the window is resized. (TASK 2)
+		
+		scene.sceneCam().resize(width, height);
 	}
 
 	@Override
